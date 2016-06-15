@@ -74,7 +74,7 @@ type ProblemInfo struct {
 
 func writeProblem(number int, description string, page string) {
 	problem := ProblemInfo{number, description}
-	const goTemplate string = 
+	const goTemplate string =
 `package main
 /*
 Implements Project Euler Problem {{.Number}}:
