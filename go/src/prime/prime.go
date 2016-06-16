@@ -11,7 +11,9 @@ func IsPrime(n int) bool {
 //func Sieve(start, end int) chan int {
 func Sieve() chan int {
 	ch := make(chan int, 0)
-	sieve := SieveQueue{sieveRecord{2, 4}}
+	sieve := make(SieveQueue, 0)
+	var initial sieveRecord
+	sieve = append(sieve, &initial)
 
 	go func() {
 		var next sieveRecord
@@ -19,7 +21,7 @@ func Sieve() chan int {
 		ch <- 2
 		for {
 			for {
-				next = sieve.Pop()
+				next = sieve.Pop()(sieveRecord)
 				if n < next.next {
 					sieve.Push(sieveRecord{n, n + n, 0})
 					ch <-n
