@@ -1,4 +1,5 @@
 package main
+
 /*
 Implements Project Euler Problem 7:
 https://projecteuler.net/problem=7
@@ -14,4 +15,12 @@ import (
 
 func main() {
 	fmt.Println("Project Euler Problem 7")
+	count := 1
+	for p := range prime.Sieve() {
+		if count == 10001 {
+			fmt.Println(p)
+			break
+		}
+		count++
+	}
 }

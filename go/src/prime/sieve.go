@@ -4,45 +4,90 @@ import (
 	"container/heap"
 )
 
-type sieveRecord struct {
-	Next int
+type SieveRecord struct {
+	Next    int
 	Divisor int
-	index int
 }
 
-type SieveQueue []*sieveRecord
+type SieveQueue []SieveRecord
 
 func (sq SieveQueue) Len() int { return len(sq) }
 
 func (sq SieveQueue) Less(i, j int) bool {
-	return sq[i].Next < sq[j].Next;
+	return sq[i].Next < sq[j].Next
 }
 
 func (sq SieveQueue) Swap(i, j int) {
 	sq[i], sq[j] = sq[j], sq[i]
-	sq[i].index = i
-	sq[j].index = j
 }
 
-func (sq *SieveQueue) Push(x interface{}) {
-	n := len(*sq)
-	item := x.(*sieveRecord)
-	item.index = n
-	*sq = append(*sq, item)
+func (sq *SieveQueue) Push(item interface{}) {
+	*sq = append(*sq, item.(SieveRecord))
 }
 
 func (sq *SieveQueue) Pop() interface{} {
 	old := *sq
 	n := len(old)
 	item := old[n-1]
-	item.index = -1 // For safety?
-	*sq = old[0:n-1]
+	*sq = old[0 : n-1]
 	return item
 }
 
-func (sq *SieveQueue) update(item *sieveRecord, divisor int, next int) {
-	item.Divisor = divisor
-	item.Next = next
-	heap.Fix(sq, item.index)
+//func Sieve(start, end int) chan int {
+func Sieve() chan int {
+	ch := make(chan int, 0)
+	sq := &SieveQueue{}
+	heap.Init(sq)
+
+	go func() {
+		var next SieveRecord
+		exclusions := &SieveQueue{}
+		heap.Init(exclusions)
+		next = SieveRecord{3, 0}
+		n := 2
+
+		// We count up numbers
+		for n = 2; true; n++ {
+			if n < next.Next {
+				// We found a non-excluded number.  It's prime.
+				ch <- n
+				heap.Push(exclusions, SieveRecord{n + n, n})
+				if next.Divisor == 0 {
+					next = heap.Pop(exclusions).(SieveRecord)
+				}
+			} else {
+				// Cross off numbers and move us forward.
+				for n == next.Next {
+					heap.Push(exclusions, SieveRecord{n + next.Divisor, next.Divisor})
+					next = heap.Pop(exclusions).(SieveRecord)
+				}
+			}
+		}
+	}()
+
+	return ch
 }
 
+/*func LinearSieve() chan int {
+	ch := make(chan int, 0)
+
+	go func() {
+		primes := make([]SieveRecord, 0)
+
+		n := 2
+		for {
+			var newPrime SieveRecord
+			for _, prime := range primes {
+				if n == prime.Next {
+					primes
+				}
+			}
+			if newPrime.Divisor != 0 {
+				primes = append(primes, newPrime
+			}
+			n++
+		}
+	}()
+	return ch
+}
+*/

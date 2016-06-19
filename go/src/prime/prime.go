@@ -1,5 +1,9 @@
 package prime
 
+import (
+	"fmt"
+)
+
 func IsPrime(n int) bool {
 	// IsPrime returns true if n has factors (other than itself and 1).
 	for range Factor(n) {
@@ -8,32 +12,10 @@ func IsPrime(n int) bool {
 	return false
 }
 
-//func Sieve(start, end int) chan int {
-func Sieve() chan int {
-	ch := make(chan int, 0)
-	sieve := make(SieveQueue, 0)
-	var initial sieveRecord
-	sieve = append(sieve, &initial)
-
-	go func() {
-		var next sieveRecord
-		n := 2
-		ch <- 2
-		for {
-			for {
-				next = sieve.Pop()(sieveRecord)
-				if n < next.next {
-					sieve.Push(sieveRecord{n, n + n, 0})
-					ch <-n
-					n++
-				} else {
-					break
-				}
-			}
-			sieve.Push(sieveRecord{next.divisor, next.divisor + n.next, 0})
-		}
-	}()
-
-	return ch
+func PrintExclusions(n int, exclusions SieveQueue) {
+	fmt.Printf("N: %d E: ", n)
+	for _, e := range exclusions {
+		fmt.Printf("(%d, %d) ", e.Next, e.Divisor)
+	}
+	fmt.Println()
 }
-
