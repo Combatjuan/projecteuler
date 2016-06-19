@@ -1,14 +1,39 @@
 package prime
 
 import (
-//	"math/big"
+//	"math"
 )
+
+func Divisors(n int) []int {
+	d := make([]int, 0)
+	for n := range Divisor(n) {
+		d = append(d, n)
+	}
+	return d
+}
+
+func Divisor(n int) chan int {
+	ch := make(chan int, 0)
+	go func() {
+		for i := 1; i < n; i++ {
+			if n%i == 0 {
+				ch <- i
+			}
+			if i*i > n {
+				break
+			}
+		}
+		ch <- n
+		close(ch)
+	}()
+	return ch
+}
 
 func Factors(n int) []int {
 	factors := make([]int, 0)
 	returnChannel := Factor(n)
 	for {
-		n, ok := <- returnChannel
+		n, ok := <-returnChannel
 		if !ok {
 			return factors
 		} else {
@@ -27,12 +52,12 @@ func Factor(n int) chan int {
 	go func() {
 		var div int = 2
 		for {
-			if n % div == 0 {
+			if n%div == 0 {
 				n /= div
 				ch <- div
 				div = 2
 			} else {
-				if div * div > n {
+				if div*div > n {
 					if n > 1 {
 						ch <- n
 					}
@@ -86,4 +111,3 @@ func Factor(n int) chan int {
 //!	}
 //!	return factors
 //!}
-
